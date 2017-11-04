@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "665625358123",
+    "firebase_url": "https://todolist-36dba.firebaseio.com",
+    "project_id": "todolist-36dba",
+    "storage_bucket": "todolist-36dba.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:665625358123:android:aa973845a5c4435a",
+        "android_client_info": {
+          "package_name": "com.kisita.doudoutlist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "665625358123-3hcgvfvoupc9npvbjk3ggpnettdfpvjo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBR59PO0dq8nV4lRkwfdY2KPjDqcVCOWc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
