@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.database.ChildEventListener;
 import com.kisita.doudoutlist.R;
 import com.kisita.doudoutlist.data.Furniture;
 import com.kisita.doudoutlist.data.Item;
@@ -26,9 +27,10 @@ import java.util.ArrayList;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public abstract class ItemFragment extends Fragment implements Parcelable {
+public abstract class ItemFragment extends Fragment implements Parcelable,ChildEventListener {
 
     protected static final String ARG_COLUMN_COUNT = "column-count";
+    protected static final String TAG              = "******* ItemFragment";
     private int                               mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
     private ArrayList<Item>                   mItems;
@@ -134,6 +136,10 @@ public abstract class ItemFragment extends Fragment implements Parcelable {
 
     public ArrayList<Item> getItems() {
         return mItems;
+    }
+
+    public void addItem(Item item){
+        mItems.add(item);
     }
 
     public OnListFragmentInteractionListener getListener() {

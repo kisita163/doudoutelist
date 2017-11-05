@@ -1,10 +1,12 @@
 package com.kisita.doudoutlist.data;
 
+import java.io.Serializable;
+
 /**
  * Created by HuguesKi on 26-09-17.
  */
 
-public abstract class Item {
+public abstract class Item implements Serializable{
 
     private  String mName;
 
