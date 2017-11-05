@@ -1,9 +1,11 @@
 package com.kisita.doudoutlist.ui;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,8 +15,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.vision.barcode.Barcode;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,7 +34,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity implements ItemFragment.OnListFragmentInteractionListener {
 
@@ -38,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements ItemFragment.OnLi
     private Fragment     monthShoppingFragment;
     private Fragment     monthsFragment;
     private FirebaseAuth mAuth;
-    private String       monthKey;
+    private static final int RC_BARCODE_CAPTURE = 9001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,23 +78,40 @@ public class MainActivity extends AppCompatActivity implements ItemFragment.OnLi
             public void onClick(View view) {
                 if(monthShoppingFragment != null && monthShoppingFragment.isVisible()){
                     Log.i(TAG,"furniture");
-                    Furniture f = new Furniture("Tata",10.2,2,"",3,"3");
-                    addFurnitureToFirebase(f,((MonthShoppingFragment)monthShoppingFragment).getMonth());
-                    //((MonthShoppingFragment)monthShoppingFragment).getItems().add(f);
-                    //((MonthShoppingFragment)monthShoppingFragment).getAdapter().notifyDataSetChanged();
-
+                    getBarCode();
                 }
 
                 if(monthsFragment != null && monthsFragment.isVisible()){
                     Log.i(TAG,"month");
                     String month    = getToday();
-                    String monthKey = getFireBaseKey("month");
-                    addMonthToFireBase(month,monthKey);
-                    //((MonthsFragment)monthsFragment).getItems().add(new Month(month,monthKey));
-                    //((MonthsFragment)monthsFragment).getAdapter().notifyDataSetChanged();
+                    // Is the month already entered?
+                    if(checkMonth(month)) {
+                        String monthKey = getFireBaseKey("month");
+                        addMonthToFireBase(month, monthKey);
+                    }else{
+                        // Tell the user the month already exist
+                        Toast.makeText(getApplicationContext(), R.string.currentMonth,Toast.LENGTH_LONG).show();
+                    }
                 }
             }
         });
+    }
+
+    private boolean checkMonth(String month) {
+        SharedPreferences sharedPref = getSharedPreferences(getResources().getString(R.string.dlMonth),
+                Context.MODE_PRIVATE);
+        String currMonth = sharedPref.getString(getResources().getString(R.string.dlMonthValue),"");
+
+        if(currMonth.equalsIgnoreCase("")){ // No month saved at all. Save this one
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(getString(R.string.dlMonthValue),month);
+            editor.commit();
+        }
+
+        if(currMonth.equalsIgnoreCase(month)){
+            return false;
+        }
+        return true;
     }
 
     private void addMonthToFireBase(String month,String key) {
@@ -146,6 +166,14 @@ public class MainActivity extends AppCompatActivity implements ItemFragment.OnLi
         return true;
     }
 
+    private void getBarCode(){
+        Intent intent = new Intent(this, BarcodeCaptureActivity.class);
+        intent.putExtra(BarcodeCaptureActivity.AutoFocus, true); // TODO
+        intent.putExtra(BarcodeCaptureActivity.UseFlash,true);
+
+        startActivityForResult(intent, RC_BARCODE_CAPTURE);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -185,8 +213,42 @@ public class MainActivity extends AppCompatActivity implements ItemFragment.OnLi
     public static String getToday(){
         Date presentTime_Date = Calendar.getInstance().getTime();
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM");
-        //dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return dateFormat.format(presentTime_Date);
+        return dateFormat.format(presentTime_Date).toUpperCase();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == RC_BARCODE_CAPTURE) {
+            if (resultCode == CommonStatusCodes.SUCCESS) {
+                if (data != null) {
+                    Barcode barcode = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
+                    Log.d(TAG, "Barcode read: " + barcode.displayValue);
+                    if(checkFurniture(barcode.displayValue)) {
+                        addFurnitureToFirebase(new Furniture(barcode.displayValue, ""), ((MonthShoppingFragment) monthShoppingFragment).getMonth());
+                    }else{
+                        Toast.makeText(getApplicationContext(), R.string.furnitureExists,Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Log.d(TAG, "No barcode captured, intent data is null");
+                }
+            } else {
+                Log.d(TAG, "Failed to read anything...");
+            }
+        }
+        else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private boolean checkFurniture(String displayValue) {
+        if(monthShoppingFragment != null){
+            for(Item f  : ((MonthShoppingFragment) monthShoppingFragment).getItems()){
+                if(f.getName().equalsIgnoreCase(displayValue)){
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 
     public DatabaseReference getDb() {

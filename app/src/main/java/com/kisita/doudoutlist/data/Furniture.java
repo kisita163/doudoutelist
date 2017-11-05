@@ -28,6 +28,15 @@ public class Furniture extends Item{
         this.mPriority   = Integer.valueOf(mPriority);
     }
 
+    public Furniture(String name,String key){
+        super(name,key);
+        this.mPrice      = 0.0;
+        this.mQuantity   = 0;
+        this.mPictureUrl = "";
+        this.mPriority   = 0;
+
+    }
+
     public double getPrice() {
         return mPrice;
     }
