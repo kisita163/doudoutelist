@@ -248,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements ItemFragment.OnLi
                 }
             }
         }
-        return false;
+        return true;
     }
 
     public DatabaseReference getDb() {
