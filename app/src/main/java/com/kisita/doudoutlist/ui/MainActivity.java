@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements ItemFragment.OnLi
 
     private static final String TAG = "**** Doudoute list" ;
     private Fragment     monthShoppingFragment;
-    private Fragment     furnituresShoppingFragment;
+    private Fragment     monthsFragment;
     private FirebaseAuth mAuth;
     private String       monthKey;
 
@@ -74,20 +74,21 @@ public class MainActivity extends AppCompatActivity implements ItemFragment.OnLi
             @Override
             public void onClick(View view) {
                 if(monthShoppingFragment != null && monthShoppingFragment.isVisible()){
+                    Log.i(TAG,"furniture");
+                    Furniture f = new Furniture("Tata",10.2,2,"",3,"3");
+                    addFurnitureToFirebase(f,((MonthShoppingFragment)monthShoppingFragment).getMonth());
+                    //((MonthShoppingFragment)monthShoppingFragment).getItems().add(f);
+                    //((MonthShoppingFragment)monthShoppingFragment).getAdapter().notifyDataSetChanged();
+
+                }
+
+                if(monthsFragment != null && monthsFragment.isVisible()){
                     Log.i(TAG,"month");
                     String month    = getToday();
                     String monthKey = getFireBaseKey("month");
                     addMonthToFireBase(month,monthKey);
-                    ((MonthShoppingFragment)monthShoppingFragment).getItems().add(new Month(month,monthKey));
-                    ((MonthShoppingFragment)monthShoppingFragment).getAdapter().notifyDataSetChanged();
-                }
-
-                if(furnituresShoppingFragment != null && furnituresShoppingFragment.isVisible()){
-                    Log.i(TAG,"furniture");
-                    Furniture f = new Furniture("Tata",10.2,2,"",3,"3");
-                    addFurnitureToFirebase(f,"");
-                    ((MonthShoppingFragment)furnituresShoppingFragment).getItems().add(f);
-                    ((MonthShoppingFragment)furnituresShoppingFragment).getAdapter().notifyDataSetChanged();
+                    //((MonthsFragment)monthsFragment).getItems().add(new Month(month,monthKey));
+                    //((MonthsFragment)monthsFragment).getAdapter().notifyDataSetChanged();
                 }
             }
         });
@@ -132,9 +133,9 @@ public class MainActivity extends AppCompatActivity implements ItemFragment.OnLi
     }
 
     private void setFragment() {
-        monthShoppingFragment = MonthsFragment.newInstance(1);
+        monthsFragment = MonthsFragment.newInstance(1);
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, monthShoppingFragment ,"Title")
+                .replace(R.id.content_frame, monthsFragment ,"Title")
                 .commit();
     }
 
@@ -165,11 +166,11 @@ public class MainActivity extends AppCompatActivity implements ItemFragment.OnLi
         Log.i(TAG,item.getClass().toString());
 
         if(item instanceof Month) {
-            furnituresShoppingFragment = MonthShoppingFragment.newInstance(1);
+            monthShoppingFragment = MonthShoppingFragment.newInstance(1,item.getKey());
             getSupportFragmentManager().beginTransaction()
                     .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
                     .addToBackStack(null)
-                    .replace(R.id.content_frame, furnituresShoppingFragment, "Title")
+                    .replace(R.id.content_frame, monthShoppingFragment, "Title")
                     .commit();
         }
 
