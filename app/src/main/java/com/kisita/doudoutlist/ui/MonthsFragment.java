@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-public class MonthShoppingFragment extends ItemFragment {
+public class MonthsFragment extends ItemFragment {
 
     public static MonthShoppingFragment newInstance(int columnCount) {
         MonthShoppingFragment fragment = new MonthShoppingFragment();

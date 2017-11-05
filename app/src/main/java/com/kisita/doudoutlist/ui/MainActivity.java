@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements ItemFragment.OnLi
     }
 
     private void setFragment() {
-        monthShoppingFragment = MonthShoppingFragment.newInstance(1);
+        monthShoppingFragment = MonthsFragment.newInstance(1);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_frame, monthShoppingFragment ,"Title")
                 .commit();
