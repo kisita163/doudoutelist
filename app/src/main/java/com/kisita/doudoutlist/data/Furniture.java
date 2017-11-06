@@ -22,10 +22,10 @@ public class Furniture extends Item{
 
     public Furniture(String name, String price, String quantity, String mPictureUrl, String mPriority,String key) {
         super(name,key);
-        this.mPrice      = Double.valueOf(price);
-        this.mQuantity   = Integer.valueOf(quantity);
+        this.mPrice      = Double.parseDouble(price);
+        this.mQuantity   = Integer.parseInt(quantity);
         this.mPictureUrl = mPictureUrl;
-        this.mPriority   = Integer.valueOf(mPriority);
+        this.mPriority   = Integer.parseInt(mPriority);
     }
 
     public Furniture(String name,String key){
